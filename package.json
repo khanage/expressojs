@@ -1,0 +1,26 @@
+{
+  "name": "pulpparse",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "gulp": "^3.9.0",
+    "pulp": "^3.2.2",
+    "purescript": "^0.6.10",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "devDependencies": {
+    "browserify": "^10.2.4",
+    "gulp-browserify": "^0.5.1",
+    "gulp-install": "^0.4.0",
+    "gulp-rename": "^1.2.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,18 @@
+{
+  "name": "pulpparse",
+  "version": "1.0.0",
+  "moduleType": [
+    "node"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-parsing": "~0.3.1",
+    "purescript-quickcheck": "~0.5.2",
+    "purescript-control": "~0.2.6"
+  }
+}
