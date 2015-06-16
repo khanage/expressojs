@@ -13,6 +13,7 @@
   "dependencies": {
     "purescript-parsing": "~0.3.1",
     "purescript-quickcheck": "~0.5.2",
-    "purescript-control": "~0.2.6"
+    "purescript-control": "~0.2.6",
+    "purescript-lens": "~0.7.0"
   }
 }

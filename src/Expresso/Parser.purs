@@ -1,4 +1,4 @@
-module Expresso.Parser (parseExpressoExpression) where
+module Expresso.Parser where
 
 import Data.Array
 import Data.Either
@@ -57,7 +57,12 @@ facet = choice [ keyword, geolocation, flatValue ]
               geolocation = betweenS "geolocation(" ")" do
                 str <- manyFlattened (satisfy ((/=) ")"))
                 return $ facetGeolocation str
-              
+
+placeholderP :: ExpressoParser ExpressoExpression
+placeholderP = do
+  string "<!>."
+  return Placeholder
+
 expressionP :: ExpressoParser ExpressoExpression
 expressionP = do
   aspect <- ident
@@ -65,7 +70,7 @@ expressionP = do
   return $ expression aspect facet
 
 expressoParser :: ExpressoParser ExpressoExpression
-expressoParser = choice [ branchParser, hierarchicalParser, expressionP ]
+expressoParser = choice [ branchParser, hierarchicalParser, placeholderP, expressionP ]
 
 -- Won't compile if this is in the outer scope
   where hierarchicalParser = betweenS "(C." ")" $ do

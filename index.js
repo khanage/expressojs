@@ -27,11 +27,14 @@ function Expression(value) {
         
         return new Expression(oredResult);
     };
-
+      
     this.replacePlaceholderWith = function(expression) {
-        Operators.replacePlaceholderWith(expression.rawExpression)(value).value0;
+        var replacedValue = Operators.replacePlaceholder(expression.rawExpression)(value);
+
+        if(replacedValue.value0) return new Expression(replacedValue.value0);
+
+        return undefined;
     }
-    
     this.toString = function() { return Data.expressionShow.show(value); };
 }
 
@@ -39,8 +42,15 @@ function Expresso() {
     this.parseExpression = function(incoming) {
         var parse = expressoParser.parseExpressoExpression(incoming);
 
-        return new Expression(parse.value0);
+        if(parse.value0) return new Expression(parse.value0);
+
+        return undefined;
     };
+
+    this.findPlaceholder = function(value) {
+        return Operators.findPlaceholder(value.rawExpression);
+    };
+
 };
 
 global.Expresso = new Expresso();

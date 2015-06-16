@@ -5,7 +5,7 @@ var gulp = require('gulp'),
     source = require('vinyl-source-stream');
 
 gulp.task('restore-packages', function() { 
-    return gulp.src(['./package.json'])
+    return gulp.src(['./bower.json', './package.json'])
 	.pipe(install());
 });
 

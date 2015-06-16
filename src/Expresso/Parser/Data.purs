@@ -10,32 +10,33 @@ type AspectAndFacet = { aspect :: String, facet :: Facet }
 aspectAndFacet :: String -> Facet -> AspectAndFacet
 aspectAndFacet a f = { aspect: a, facet: f }
 
-data Facet = Value { literal :: String }
-           | Keyword { keyword :: String }
-           | Geolocation { geolocation :: String }
+data Facet = Value String 
+           | Keyword String 
+           | Geolocation String 
 
 facetValue :: String -> Facet
-facetValue l = Value { literal: l }
+facetValue l = Value l 
 
 facetKeyword :: String -> Facet
-facetKeyword k = Keyword { keyword: k }
+facetKeyword k = Keyword k 
 
 facetGeolocation :: String -> Facet
-facetGeolocation g = Geolocation { geolocation: g }
+facetGeolocation g = Geolocation g 
 
 
-data ExpressoExpression = Expression { expression :: AspectAndFacet }
-                        | ParentOf { parent :: AspectAndFacet, child :: ExpressoExpression }
-                        | BranchOf { operator :: BranchType, expressions :: [ExpressoExpression] }
+data ExpressoExpression = Placeholder
+                        | Expression AspectAndFacet 
+                        | ParentOf AspectAndFacet ExpressoExpression 
+                        | BranchOf BranchType [ExpressoExpression] 
 
 expression :: String -> Facet -> ExpressoExpression
-expression a f = let anf = aspectAndFacet a f in Expression { expression: anf }
+expression a f = let anf = aspectAndFacet a f in Expression anf 
 
 parentOf :: AspectAndFacet -> ExpressoExpression -> ExpressoExpression
-parentOf anf e = ParentOf { parent: anf, child: e }
+parentOf anf e = ParentOf anf e 
 
 branchOf :: BranchType -> [ExpressoExpression] -> ExpressoExpression
-branchOf type' expressions = BranchOf { operator: type', expressions: expressions } 
+branchOf type' expressions = BranchOf type' expressions  
 
 -- | Instances
 
@@ -51,22 +52,36 @@ instance branchTypeShow :: Show BranchType where
   show Or  = "Or"         
 
 instance facetEq :: Eq Facet where
-  (==) (Value {literal = a })          (Value {literal = b})           = a == b
-  (==) (Keyword {keyword = a })        (Keyword {keyword = b})         = a == b
-  (==) (Geolocation {geolocation = a}) (Geolocation {geolocation = b}) = a == b
+  (==) (Value a)       (Value b)       = a == b
+  (==) (Keyword a)     (Keyword b)     = a == b
+  (==) (Geolocation a) (Geolocation b) = a == b
   (==) _ _ = false
 
   (/=) a b = not (a == b)
 
 instance facetShow :: Show Facet where
-  show (Value { literal = a })           = a <> "."
-  show (Keyword { keyword = a })         = "keyword(" <> a <> "."
-  show (Geolocation { geolocation = a }) = "geolocation(" <> a <> ")."
+  show (Value a)       = a <> "."
+  show (Keyword a)     = "keyword(" <> a <> "."
+  show (Geolocation a) = "geolocation(" <> a <> ")."
+
+instance expressionEq :: Eq ExpressoExpression where
+  (==) Placeholder          Placeholder          = true
+  (==) (Expression anfl)    (Expression anfr)    = anfl `eqAnf` anfr
+  (==) (ParentOf anfl expl) (ParentOf anfr expr) = anfl `eqAnf` anfr && expl == expr
+  (==) (BranchOf btl expsl) (BranchOf btr expsr) = btl == btr && expsl == expsr
+  (==) _ _ = false
+
+  (/=) l r = not (l == r)
 
 instance expressionShow :: Show ExpressoExpression where
-  show (Expression {expression = anf})                = showAnf anf
-  show (ParentOf {parent = anf, child = exp})         = "(C." <> showAnf anf <> "(" <> show exp <> ")."
-  show (BranchOf {operator = bt, expressions = exps}) = "(" <> show bt <> "." <> intercalate "_." (map show exps) <> ")"
+  show Placeholder        = "<!>."
+  show (Expression anf)   = showAnf anf
+  show (ParentOf anf exp) = "(C." <> showAnf anf <> "(" <> show exp <> ")."
+  show (BranchOf bt exps) = "(" <> show bt <> "." <> intercalate "_." (map show exps) <> ")"
+
+eqAnf :: AspectAndFacet -> AspectAndFacet -> Boolean
+eqAnf ({ aspect = leftAspect, facet = leftFacet }) ({ aspect = rightAspect, facet = rightFacet})
+    = leftAspect == rightAspect && leftFacet == rightFacet
 
 showAnf :: AspectAndFacet -> String
 showAnf {aspect = a, facet = f} = a <> "." <> show f

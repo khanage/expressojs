@@ -1,5 +1,6 @@
 module Test.Main where
 
+import Data.Maybe
 import Data.Either
 import Data.Array
 
@@ -14,31 +15,6 @@ import Test.Unit
 
 import Debug.Trace
 
-
-didParse :: forall a. ExpressoParser a -> String -> Boolean
-didParse parser input = case runParser input parser of
-  Left _ -> false
-  Right _ -> true
-
-assertParsedWith :: forall e. ExpressoParser ExpressoExpression
-                 -> String
-                 -- ^ message to use for asserting
-                 -> String
-                 -- ^ incoming data
-                 -> ( (Boolean -> Eff (trace :: Trace | e) Unit) 
-                      -> ExpressoExpression 
-                      -> Eff (trace :: Trace | e) Unit )
-                 -- ^ call back to match on
-                 -> Assertion (trace :: Trace | e)
-assertParsedWith parser message incoming parsedResultCallback =
-  assertFn message \done -> case runParser incoming parser of
-    Right x -> parsedResultCallback done x
-    Left x -> do
-      print $ "Error parsing " <> show x
-      done false
-
-assertParsed = assertParsedWith expressoParser
-
 main = runTest do
   test "simple test" do
     assert "'Key.Value.' parses" $ didParse expressoParser "Key.Value."
@@ -51,26 +27,23 @@ main = runTest do
 
     assertParsed "'Key.Value.' parses to facet expression" input
       \done parse -> case parse of
-        Expression exp -> done $ exp.aspect == "Key"
-                                && exp.facet  == Value "Value"
+        Expression exp -> done $ exp.aspect == "Key" 
+                              && exp.facet  == Value "Value" 
         otherwise -> done false
 
   test "keyword facet" do
     let input = "Key.keyword(hello)."
-        expected = Expression "Key" (Keyword "hello")
+        expected = expression "Key" (Keyword "hello")
         inFmt s = "'" <> input <> "' " <> s
 
     assertParsed (inFmt "didn't parse") input
       \done parse -> done true
 
-    
-    
-
   test "parent facet" do
     let input = "(C.Key.Value._.Child.V.)"
         inFmt s = "'" <> input <> "' "  <> s
-        expected = ParentOf {aspect: "Key", facet: (Value "Value") }
-                     (Expression {aspect: "Child", facet: (Value "V") })
+        expected = ParentOf {aspect: "Key", facet: Value "Value" }
+                   (Expression {aspect: "Child", facet: Value "V" })
 
     assertParsed (inFmt "didn't parse to " <> show expected) input
       \done parse -> case parse of
@@ -156,3 +129,27 @@ main = runTest do
       \done parse -> case parse of
         BranchOf And ((BranchOf Or _):_) -> done true
         otherwise -> done false
+
+didParse :: forall a. ExpressoParser a -> String -> Boolean
+didParse parser input = case runParser input parser of
+  Left _ -> false
+  Right _ -> true
+
+assertParsedWith :: forall e. ExpressoParser ExpressoExpression
+                 -> String
+                 -- ^ message to use for asserting
+                 -> String
+                 -- ^ incoming data
+                 -> ( (Boolean -> Eff (trace :: Trace | e) Unit) 
+                      -> ExpressoExpression 
+                      -> Eff (trace :: Trace | e) Unit )
+                 -- ^ call back to match on
+                 -> Assertion (trace :: Trace | e)
+assertParsedWith parser message incoming parsedResultCallback =
+  assertFn message \done -> case runParser incoming parser of
+    Right x -> parsedResultCallback done x
+    Left x -> do
+      print $ "Error parsing " <> show x
+      done false
+
+assertParsed = assertParsedWith expressoParser
