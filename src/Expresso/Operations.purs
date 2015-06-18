@@ -27,27 +27,24 @@ expressionOr :: ExpressionMerge
 expressionOr = expressionBuilder Or
 
 replacePlaceholder :: ExpressoExpression -> ExpressoExpression -> Maybe ExpressoExpression
-replacePlaceholder toReplace expression =
+replacePlaceholder expression toReplace =
   case expression of
     Placeholder -> Just toReplace
 
-    ParentOf parent child   ->
-      let mreplaced = replacePlaceholder toReplace child
+    ParentOf parent child ->
+      let mreplaced = replacePlaceholder child toReplace
           update updatedChild = return $ ParentOf parent updatedChild 
       in mreplaced >>= update
 
-    BranchOf operator expressions  ->
-      let seed = {found: false, res: []}
-
-          -- | tries to replace in all children
-          evaluateAllBranches currentExp seed = 
-            case replacePlaceholder toReplace currentExp of
+    BranchOf operator expressions ->
+      let evaluateAllBranches currentExp seed = 
+            case replacePlaceholder currentExp toReplace of
               Just replaced -> { found: true      , res: (  replaced:seed.res) }
               Nothing       -> { found: seed.found, res: (currentExp:seed.res) }
 
-      in case foldr evaluateAllBranches seed expressions of
-        {found = found, res = res}
-          | found -> Just $ BranchOf operator expressions 
+      in case foldr evaluateAllBranches {found: false, res: []} expressions of
+        {found = foundInEval, res = modifiedResults}
+          | foundInEval -> Just $ BranchOf operator modifiedResults
         otherwise -> Nothing
 
     otherwise -> Nothing

@@ -5636,12 +5636,9 @@ var replacePlaceholder = function (toReplace) {
         };
         if (expression instanceof Expresso_Parser_Data.ParentOf) {
             var update = function (updatedChild) {
-                return Prelude["return"](Data_Maybe.monadMaybe)(new Expresso_Parser_Data.ParentOf({
-                    parent: expression.value0.parent, 
-                    child: updatedChild
-                }));
+                return Prelude["return"](Data_Maybe.monadMaybe)(new Expresso_Parser_Data.ParentOf(expression.value0, updatedChild));
             };
-            var mreplaced = replacePlaceholder(toReplace)(expression.value0.child);
+            var mreplaced = replacePlaceholder(toReplace)(expression.value1);
             return Prelude[">>="](Data_Maybe.bindMaybe)(mreplaced)(update);
         };
         if (expression instanceof Expresso_Parser_Data.BranchOf) {
@@ -5651,14 +5648,14 @@ var replacePlaceholder = function (toReplace) {
             };
             var evaluateAllBranches = function (currentExp) {
                 return function (seed_1) {
-                    var _6 = replacePlaceholder(toReplace)(currentExp);
-                    if (_6 instanceof Data_Maybe.Just) {
+                    var _51 = replacePlaceholder(toReplace)(currentExp);
+                    if (_51 instanceof Data_Maybe.Just) {
                         return {
                             found: true, 
-                            res: Prelude[":"](_6.value0)(seed_1.res)
+                            res: Prelude[":"](_51.value0)(seed_1.res)
                         };
                     };
-                    if (_6 instanceof Data_Maybe.Nothing) {
+                    if (_51 instanceof Data_Maybe.Nothing) {
                         return {
                             found: seed_1.found, 
                             res: Prelude[":"](currentExp)(seed_1.res)
@@ -5667,12 +5664,9 @@ var replacePlaceholder = function (toReplace) {
                     throw new Error("Failed pattern match");
                 };
             };
-            var _8 = Data_Foldable.foldr(Data_Foldable.foldableArray)(evaluateAllBranches)(seed)(expression.value0.expressions);
-            if (_8.found) {
-                return Data_Maybe.Just.create(new Expresso_Parser_Data.BranchOf({
-                    operator: expression.value0.operator, 
-                    expressions: expression.value0.expressions
-                }));
+            var _53 = Data_Foldable.foldr(Data_Foldable.foldableArray)(evaluateAllBranches)(seed)(expression.value1);
+            if (_53.found) {
+                return Data_Maybe.Just.create(new Expresso_Parser_Data.BranchOf(expression.value0, expression.value1));
             };
             return Data_Maybe.Nothing.value;
         };
@@ -5680,30 +5674,18 @@ var replacePlaceholder = function (toReplace) {
     };
 };
 var expressionBuilder = function (op) {
-    return function (_0) {
-        return function (_1) {
-            if (_0 instanceof Expresso_Parser_Data.BranchOf && (_1 instanceof Expresso_Parser_Data.BranchOf && (Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_0.value0.operator)(op) && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_1.value0.operator)(op)))) {
-                return new Expresso_Parser_Data.BranchOf({
-                    operator: op, 
-                    expressions: Prelude["++"](Data_Array.semigroupArray)(_0.value0.expressions)(_1.value0.expressions)
-                });
+    return function (_21) {
+        return function (_22) {
+            if (_21 instanceof Expresso_Parser_Data.BranchOf && (_22 instanceof Expresso_Parser_Data.BranchOf && (Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_21.value0)(op) && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_22.value0)(op)))) {
+                return new Expresso_Parser_Data.BranchOf(op, Prelude["++"](Data_Array.semigroupArray)(_21.value1)(_22.value1));
             };
-            if (_0 instanceof Expresso_Parser_Data.BranchOf && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_0.value0.operator)(op)) {
-                return new Expresso_Parser_Data.BranchOf({
-                    operator: op, 
-                    expressions: Prelude["++"](Data_Array.semigroupArray)(_0.value0.expressions)([ _1 ])
-                });
+            if (_21 instanceof Expresso_Parser_Data.BranchOf && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_21.value0)(op)) {
+                return new Expresso_Parser_Data.BranchOf(op, Prelude["++"](Data_Array.semigroupArray)(_21.value1)([ _22 ]));
             };
-            if (_1 instanceof Expresso_Parser_Data.BranchOf && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_1.value0.operator)(op)) {
-                return new Expresso_Parser_Data.BranchOf({
-                    operator: op, 
-                    expressions: Prelude[":"](_0)(_1.value0.expressions)
-                });
+            if (_22 instanceof Expresso_Parser_Data.BranchOf && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_22.value0)(op)) {
+                return new Expresso_Parser_Data.BranchOf(op, Prelude[":"](_21)(_22.value1));
             };
-            return new Expresso_Parser_Data.BranchOf({
-                operator: op, 
-                expressions: [ _0, _1 ]
-            });
+            return new Expresso_Parser_Data.BranchOf(op, [ _21, _22 ]);
         };
     };
 };
@@ -5781,45 +5763,46 @@ var Expression = (function () {
     return Expression;
 })();
 var ParentOf = (function () {
-    function ParentOf(value0) {
+    function ParentOf(value0, value1) {
         this.value0 = value0;
+        this.value1 = value1;
     };
     ParentOf.create = function (value0) {
-        return new ParentOf(value0);
+        return function (value1) {
+            return new ParentOf(value0, value1);
+        };
     };
     return ParentOf;
 })();
 var BranchOf = (function () {
-    function BranchOf(value0) {
+    function BranchOf(value0, value1) {
         this.value0 = value0;
+        this.value1 = value1;
     };
     BranchOf.create = function (value0) {
-        return new BranchOf(value0);
+        return function (value1) {
+            return new BranchOf(value0, value1);
+        };
     };
     return BranchOf;
 })();
 var parentOf = function (anf) {
     return function (e) {
-        return new ParentOf({
-            parent: anf, 
-            child: e
-        });
+        return new ParentOf(anf, e);
     };
 };
 var facetValue = function (l) {
-    return new Value({
-        literal: l
-    });
+    return new Value(l);
 };
 var facetShow = new Prelude.Show(function (_19) {
     if (_19 instanceof Value) {
-        return _19.value0.literal + ".";
+        return _19.value0 + ".";
     };
     if (_19 instanceof Keyword) {
-        return "keyword(" + (_19.value0.keyword + ".");
+        return "keyword(" + (_19.value0 + ".");
     };
     if (_19 instanceof Geolocation) {
-        return "geolocation(" + (_19.value0.geolocation + ").");
+        return "geolocation(" + (_19.value0 + ").");
     };
     throw new Error("Failed pattern match");
 });
@@ -5827,14 +5810,10 @@ var showAnf = function (_13) {
     return _13.aspect + ("." + Prelude.show(facetShow)(_13.facet));
 };
 var facetKeyword = function (k) {
-    return new Keyword({
-        keyword: k
-    });
+    return new Keyword(k);
 };
 var facetGeolocation = function (g) {
-    return new Geolocation({
-        geolocation: g
-    });
+    return new Geolocation(g);
 };
 var facetEq = new Prelude.Eq(function (a) {
     return function (b) {
@@ -5843,13 +5822,13 @@ var facetEq = new Prelude.Eq(function (a) {
 }, function (_17) {
     return function (_18) {
         if (_17 instanceof Value && _18 instanceof Value) {
-            return _17.value0.literal === _18.value0.literal;
+            return _17.value0 === _18.value0;
         };
         if (_17 instanceof Keyword && _18 instanceof Keyword) {
-            return _17.value0.keyword === _18.value0.keyword;
+            return _17.value0 === _18.value0;
         };
         if (_17 instanceof Geolocation && _18 instanceof Geolocation) {
-            return _17.value0.geolocation === _18.value0.geolocation;
+            return _17.value0 === _18.value0;
         };
         return false;
     };
@@ -5868,13 +5847,13 @@ var expressionShow = new Prelude.Show(function (_20) {
         return "<!>.";
     };
     if (_20 instanceof Expression) {
-        return showAnf(_20.value0.expression);
+        return showAnf(_20.value0);
     };
     if (_20 instanceof ParentOf) {
-        return "(C." + (showAnf(_20.value0.parent) + ("(" + (Prelude.show(expressionShow)(_20.value0.child) + ").")));
+        return "(C." + (showAnf(_20.value0) + ("(" + (Prelude.show(expressionShow)(_20.value1) + ").")));
     };
     if (_20 instanceof BranchOf) {
-        return "(" + (Prelude.show(branchTypeShow)(_20.value0.operator) + ("." + (Data_Foldable.intercalate(Data_Foldable.foldableArray)(Data_Monoid.monoidString)("_.")(Data_Array.map(Prelude.show(expressionShow))(_20.value0.expressions)) + ")")));
+        return "(" + (Prelude.show(branchTypeShow)(_20.value0) + ("." + (Data_Foldable.intercalate(Data_Foldable.foldableArray)(Data_Monoid.monoidString)("_.")(Data_Array.map(Prelude.show(expressionShow))(_20.value1)) + ")")));
     };
     throw new Error("Failed pattern match");
 });
@@ -5895,10 +5874,7 @@ var branchTypeEq = new Prelude.Eq(function (a) {
 });
 var branchOf = function (type$prime) {
     return function (expressions) {
-        return new BranchOf({
-            operator: type$prime, 
-            expressions: expressions
-        });
+        return new BranchOf(type$prime, expressions);
     };
 };
 var aspectAndFacet = function (a) {
@@ -5912,9 +5888,7 @@ var aspectAndFacet = function (a) {
 var expression = function (a) {
     return function (f) {
         var anf = aspectAndFacet(a)(f);
-        return new Expression({
-            expression: anf
-        });
+        return new Expression(anf);
     };
 };
 module.exports = {
@@ -5965,7 +5939,7 @@ var $bar$greater$greater = function (__dict_Functor_0) {
 var $greater$greater$percent = function (__dict_Monad_1) {
     return function (p) {
         return function (v) {
-            return Prelude[">>="](Text_Parsing_Parser.bindParserT(__dict_Monad_1))(p)(function (_15) {
+            return Prelude[">>="](Text_Parsing_Parser.bindParserT(__dict_Monad_1))(p)(function (_23) {
                 return Prelude["return"](Text_Parsing_Parser.monadParserT(__dict_Monad_1))(v);
             });
         };
@@ -6062,12 +6036,12 @@ var expressoParser = (function () {
     return Text_Parsing_Parser_Combinators.choice(Data_Identity.monadIdentity)([ branchParser, hierarchicalParser, placeholderP, expressionP ]);
 })();
 var parseExpressoExpression = function (incoming) {
-    var _49 = Text_Parsing_Parser.runParser(incoming)(expressoParser);
-    if (_49 instanceof Data_Either.Left) {
+    var _83 = Text_Parsing_Parser.runParser(incoming)(expressoParser);
+    if (_83 instanceof Data_Either.Left) {
         return Data_Maybe.Nothing.value;
     };
-    if (_49 instanceof Data_Either.Right) {
-        return new Data_Maybe.Just(_49.value0);
+    if (_83 instanceof Data_Either.Right) {
+        return new Data_Maybe.Just(_83.value0);
     };
     throw new Error("Failed pattern match");
 };
