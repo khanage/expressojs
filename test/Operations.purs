@@ -12,6 +12,7 @@ import Expresso.Operations
 import Expresso.Parser.Data
 
 main = do
+  -- Unit tests
   expressionReplaced
   parentReplaced
   branchReplaced

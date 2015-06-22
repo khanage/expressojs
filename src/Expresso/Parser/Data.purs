@@ -47,10 +47,6 @@ instance branchTypeEq :: Eq BranchType where
 
   (/=) a   b   = not (a == b)
 
-instance branchTypeShow :: Show BranchType where
-  show And = "And"
-  show Or  = "Or"         
-
 instance facetEq :: Eq Facet where
   (==) (Value a)       (Value b)       = a == b
   (==) (Keyword a)     (Keyword b)     = a == b
@@ -58,11 +54,6 @@ instance facetEq :: Eq Facet where
   (==) _ _ = false
 
   (/=) a b = not (a == b)
-
-instance facetShow :: Show Facet where
-  show (Value a)       = a <> "."
-  show (Keyword a)     = "keyword(" <> a <> "."
-  show (Geolocation a) = "geolocation(" <> a <> ")."
 
 instance expressionEq :: Eq ExpressoExpression where
   (==) Placeholder          Placeholder          = true
@@ -73,15 +64,25 @@ instance expressionEq :: Eq ExpressoExpression where
 
   (/=) l r = not (l == r)
 
-instance expressionShow :: Show ExpressoExpression where
-  show Placeholder        = "<!>."
-  show (Expression anf)   = showAnf anf
-  show (ParentOf anf exp) = "(C." <> showAnf anf <> "(" <> show exp <> ")."
-  show (BranchOf bt exps) = "(" <> show bt <> "." <> intercalate "_." (map show exps) <> ")"
-
 eqAnf :: AspectAndFacet -> AspectAndFacet -> Boolean
 eqAnf ({ aspect = leftAspect, facet = leftFacet }) ({ aspect = rightAspect, facet = rightFacet})
     = leftAspect == rightAspect && leftFacet == rightFacet
 
+-- | Show instances
+instance branchTypeShow :: Show BranchType where
+  show And = "And"
+  show Or  = "Or"         
+
+instance facetShow :: Show Facet where
+  show (Value a)       = a
+  show (Keyword a)     = "keyword(" <> a <> ")"
+  show (Geolocation a) = "location(" <> a <> ")"
+
+instance expressionShow :: Show ExpressoExpression where
+  show Placeholder        = "(<!>)"
+  show (Expression anf)   = showAnf anf
+  show (ParentOf anf exp) = "(C." <> showAnf anf <> "_." <> show exp <> ")"
+  show (BranchOf bt exps) = "(" <> show bt <> "." <> intercalate "_." (map show exps) <> ")"
+
 showAnf :: AspectAndFacet -> String
-showAnf {aspect = a, facet = f} = a <> "." <> show f
+showAnf {aspect = a, facet = f} = a <> "." <> show f <> "."

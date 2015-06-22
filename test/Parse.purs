@@ -1,6 +1,5 @@
 module Test.Parse where
 
-
 import Data.Maybe
 import Data.Either
 import Data.Array
@@ -132,6 +131,21 @@ main = do
         BranchOf And ((BranchOf Or _):_) -> done true
         otherwise -> done false
 
+  test "incoming from quickcheck" do
+    let input = "(Or.(<!>)_.a.location(6).)"
+        inFmt s = "'" <> input <> "' " <> s
+
+    assertParsed (inFmt "didn't parse random junk") input
+      \done parse -> case parse of
+        BranchOf Or (Placeholder:_) -> do
+          print $ "Got " <> show parse
+          done true
+
+        otherwise -> do
+          print $ "Got " <> show parse
+          done false
+
+
 didParse :: forall a. ExpressoParser a -> String -> Boolean
 didParse parser input = case runParser input parser of
   Left _ -> false
@@ -155,4 +169,4 @@ assertParsedWith parser message incoming parsedResultCallback =
       done false
 
 assertParsed = assertParsedWith expressoParser
- 
+

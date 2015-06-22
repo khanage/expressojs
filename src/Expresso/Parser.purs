@@ -54,13 +54,13 @@ facet = choice [ keyword, geolocation, flatValue ]
                 str <- manyFlattened (satisfy ((/=) ")"))
                 return $ facetKeyword str
 
-              geolocation = betweenS "geolocation(" ")" do
+              geolocation = betweenS "location(" ")" do
                 str <- manyFlattened (satisfy ((/=) ")"))
                 return $ facetGeolocation str
 
 placeholderP :: ExpressoParser ExpressoExpression
 placeholderP = do
-  string "<!>."
+  string "(<!>)"
   return Placeholder
 
 expressionP :: ExpressoParser ExpressoExpression
@@ -78,8 +78,9 @@ expressoParser = choice [ branchParser, hierarchicalParser, placeholderP, expres
           parentValue <- ident |>> facetValue
 
           let parent = aspectAndFacet parentAspect parentValue
-          
+
           string combinationsSep
+
           child <- expressoParser
           return $ parentOf parent child
           
