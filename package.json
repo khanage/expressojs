@@ -1,6 +1,6 @@
 {
-  "name": "pulpparse",
-  "version": "1.0.0",
+  "name": "Expresso",
+  "version": "0.0.1",
   "description": "",
   "main": "index.js",
   "directories": {
@@ -10,9 +10,7 @@
     "gulp": "^3.9.0",
     "pulp": "^3.2.2",
     "purescript": "^0.6.10",
-    "vinyl-source-stream": "^1.1.0"
-  },
-  "devDependencies": {
+    "vinyl-source-stream": "^1.1.0",
     "browserify": "^10.2.4",
     "gulp-browserify": "^0.5.1",
     "gulp-install": "^0.4.0",

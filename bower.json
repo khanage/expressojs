@@ -1,6 +1,6 @@
 {
-  "name": "pulpparse",
-  "version": "1.0.0",
+  "name": "Expresso",
+  "version": "0.0.1",
   "moduleType": [
     "node"
   ],
@@ -12,12 +12,13 @@
   ],
   "dependencies": {
     "purescript-parsing": "~0.3.1",
-    "purescript-quickcheck": "~0.5.2",
     "purescript-control": "~0.2.6",
     "purescript-lens": "~0.7.0",
-    "purescript-strongcheck": "~0.9.0",
     "purescript-strings": "~0.4.5",
-    "purescript-lists": "~0.6.2",
-    "purescript-test-unit": "~1.1.6"
+    "purescript-lists": "~0.6.2"
+  },
+  "devDependencies": {
+      "purescript-test-unit": "~1.1.6",
+      "purescript-strongcheck": "~0.9.0"
   }
 }

@@ -17,7 +17,6 @@ main = do
   expressionReplaced
   parentReplaced
   branchReplaced
-  replaceInTopLevel
 
 expressionReplaced =
   test "replace placeholder" do
