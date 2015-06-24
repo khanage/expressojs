@@ -1,13 +1,11 @@
-module Expresso.Operations where
+module Expresso.Operations (expressionAnd, expressionOr, replacePlaceholder) where
 
 import Data.Maybe
 import Data.Foldable
 import Expresso.Parser.Data
 import Optic.Core
-
-type ExpressionMerge = ExpressoExpression -> ExpressoExpression -> ExpressoExpression
     
-expressionBuilder :: BranchType -> ExpressionMerge
+expressionBuilder :: BranchType -> ExpressoExpression -> ExpressoExpression -> ExpressoExpression
 expressionBuilder op (BranchOf opl left) (BranchOf opr right)
   | opl == op && opr == op
   = BranchOf op (left ++ right) 
@@ -20,10 +18,10 @@ expressionBuilder op left (BranchOf opr right)
 expressionBuilder op left right
   = BranchOf op [left,right] 
 
-expressionAnd :: ExpressionMerge
+expressionAnd :: ExpressoExpression -> ExpressoExpression -> ExpressoExpression
 expressionAnd = expressionBuilder And
 
-expressionOr :: ExpressionMerge
+expressionOr :: ExpressoExpression -> ExpressoExpression -> ExpressoExpression
 expressionOr = expressionBuilder Or
 
 replacePlaceholder :: ExpressoExpression -> ExpressoExpression -> Maybe ExpressoExpression

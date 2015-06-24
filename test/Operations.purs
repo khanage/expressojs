@@ -8,6 +8,7 @@ import Text.Parsing.Parser
 import Test.Unit
 import Debug.Trace
 
+import Expresso.Parser
 import Expresso.Operations
 import Expresso.Parser.Data
 
@@ -16,6 +17,7 @@ main = do
   expressionReplaced
   parentReplaced
   branchReplaced
+  replaceInTopLevel
 
 expressionReplaced =
   test "replace placeholder" do
@@ -88,6 +90,3 @@ expressionBecame incoming replacement (Just expected) =
       print $ "Incoming: " <> show incoming
       print $ "Expected: " <> show expected
       return false
-
-        
-  

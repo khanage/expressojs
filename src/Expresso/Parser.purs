@@ -50,11 +50,11 @@ facet :: ExpressoParser Facet
 facet = choice [ keyword, geolocation, flatValue ]
         where flatValue = ident |>> facetValue
               
-              keyword = betweenS "keyword(" ")" do
+              keyword = betweenS "keyword(" ")." do
                 str <- manyFlattened (satisfy ((/=) ")"))
                 return $ facetKeyword str
 
-              geolocation = betweenS "location(" ")" do
+              geolocation = betweenS "location(" ")." do
                 str <- manyFlattened (satisfy ((/=) ")"))
                 return $ facetGeolocation str
 

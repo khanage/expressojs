@@ -1,7 +1,7 @@
 var expressoParser = require('Expresso.Parser');
 var Prelude = require('Prelude');
 var Data = require('Expresso.Parser.Data');
-var Operators = require('Expresso.Operators');
+var Operators = require('Expresso.Operations');
 
 expressionOperator = function(operator) {
     return function(left, expressionForRight) {

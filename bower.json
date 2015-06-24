@@ -17,6 +17,7 @@
     "purescript-lens": "~0.7.0",
     "purescript-strongcheck": "~0.9.0",
     "purescript-strings": "~0.4.5",
-    "purescript-lists": "~0.6.2"
+    "purescript-lists": "~0.6.2",
+    "purescript-test-unit": "~1.1.6"
   }
 }

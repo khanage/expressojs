@@ -34,15 +34,26 @@ main = do
 
   test "keyword facet" do
     let input = "Key.keyword(hello)."
-        expected = expression "Key" (Keyword "hello")
         inFmt s = "'" <> input <> "' " <> s
+        expected = expression "Key" (Keyword "hello")
 
     assertParsed (inFmt "didn't parse") input
       \done parse -> done true
 
+  test "location facet" do
+    let input = "a.location(hi)."
+        expected = expression "a" (facetGeolocation "hi")
+
+    assertParsed "'a.location(hi).' didn't parse to expression" input
+      \done parse -> case parse of
+        Expression { aspect = parsedAspect, facet = Geolocation "hi" }
+          | parsedAspect == "a" -> done true
+        otherwise -> do
+          print $ "Got unexpected result: " <> show parse
+
   test "parent facet" do
     let input = "(C.Key.Value._.Child.V.)"
-        inFmt s = "'" <> input <> "' "  <> s
+        inFmt s = "'" <> input <> "' " <> s
         expected = ParentOf {aspect: "Key", facet: (Value "Value") }
                      (Expression {aspect: "Child", facet: (Value "V") })
 
@@ -123,7 +134,7 @@ main = do
 
     assertParsed (inFmt "didn't match first and") input
       \done parse -> case parse of
-        BranchOf And _ -> done true
+        BranchOf And [(BranchOf Or [_,_]),_] -> done true
         otherwise -> done false
 
     assertParsed (inFmt "didn't match nested or") input
@@ -132,18 +143,15 @@ main = do
         otherwise -> done false
 
   test "incoming from quickcheck" do
-    let input = "(Or.(<!>)_.a.location(6).)"
+    let input = "(Or.a.location(6)._.A.B.)"
         inFmt s = "'" <> input <> "' " <> s
 
     assertParsed (inFmt "didn't parse random junk") input
       \done parse -> case parse of
-        BranchOf Or (Placeholder:_) -> do
-          print $ "Got " <> show parse
+        BranchOf Or (g:b:[]) -> do
           done true
 
-        otherwise -> do
-          print $ "Got " <> show parse
-          done false
+        otherwise -> done false
 
 
 didParse :: forall a. ExpressoParser a -> String -> Boolean
