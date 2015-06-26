@@ -34,10 +34,10 @@ function Expression(value) {
         if(replacedValue.value0) return new Expression(replacedValue.value0);
 
         return undefined;
-    }
+    };
     
     this.toString = function() { return Data.expressionShow.show(value); };
-}
+};
 
 module.exports = {
     version: "0.1",
@@ -49,4 +49,4 @@ module.exports = {
 
         return undefined;
     }    
-}
+};

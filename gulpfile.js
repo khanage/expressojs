@@ -5,20 +5,26 @@ var gulp = require('gulp'),
     source = require('vinyl-source-stream');
 
 gulp.task('restore-packages', function() { 
-    return gulp.src(['./bower.json', './package.json'])
+    return gulp.src(['./bower.json'])
 	.pipe(install());
 });
 
 gulp.task('pulp', function(cb) {
-    return exec('pulp build -o node_modules', function(err, stdout, stderr) {
+    return exec('pulp build', function(err, stdout, stderr) {
         cb(err);
     });
 });
 
-gulp.task('browserify', function() {
-    return browserify(['index.js']).bundle()
-        .pipe(source('out.js'))
-        .pipe(gulp.dest('./'));
+
+gulp.task('test', function(cb) {
+    return exec('pulp test', function(err, stdout, stderr) {
+        cb(err);
+    });
 });
 
-gulp.task('build', ['restore-packages', 'pulp', 'browserify']);
+gulp.task('copy-porcelein', function(cb) {
+    return gulp.src ('./src/Expresso/index.js')
+        .pipe (gulp.dest ('./output/Expresso/'));
+});
+
+gulp.task('default', ['restore-packages', 'pulp', 'test', 'copy-porcelein']);
