@@ -35,22 +35,18 @@ function Expression(value) {
 
         return undefined;
     }
+    
     this.toString = function() { return Data.expressionShow.show(value); };
 }
 
-function Expresso() {
-    this.parseExpression = function(incoming) {
+module.exports = {
+    version: "0.1",
+    
+    parse: function(incoming) {
         var parse = expressoParser.parseExpressoExpression(incoming);
 
         if(parse.value0) return new Expression(parse.value0);
 
         return undefined;
-    };
-
-    this.findPlaceholder = function(value) {
-        return Operators.findPlaceholder(value.rawExpression);
-    };
-
-};
-
-global.Expresso = new Expresso();
+    }    
+}
