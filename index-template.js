@@ -10,10 +10,6 @@ var expressoParser = ryvus["Expresso.Parser"];
 var Data = ryvus["Expresso.Parser.Data"];
 var Operators = ryvus["Expresso.Operations"];
 
-console.log(expressoParser);
-console.log(Data);
-console.log(Operators);
-
 expressionOperator = function(operator) {
     return function(left, expressionForRight) {
         var right = expressionForRight.rawExpression;

@@ -1,6 +1,6 @@
 {
   "name": "expresso",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A library for dealing with ryvus queries",
   "main": "index.js",
   "directories": {
@@ -18,11 +18,15 @@
     "browserify": "^10.2.4",
     "gulp": "^3.9.0",
     "gulp-browserify": "^0.5.1",
+    "gulp-bump": "^0.3.1",
+    "gulp-filter": "^2.0.2",
+    "gulp-git": "^1.2.4",
     "gulp-include": "^1.1.1",
     "gulp-install": "^0.4.0",
     "gulp-purescript": "^0.5.0-rc.1",
     "gulp-rename": "^1.2.2",
     "gulp-run": "^1.6.8",
+    "gulp-tag-version": "^1.2.1",
     "pulp": "^3.2.2",
     "vinyl-source-stream": "^1.1.0"
   }
