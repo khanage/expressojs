@@ -50,16 +50,10 @@ function Expression(value) {
     this.toString = function() { return Data.expressionShow.show(value); };
 };
 
-exports = {
-    version: "0.0.5",
+var parse = function(incoming) {
+    var parse = expressoParser.parseExpressoExpression(incoming);
 
-    raw: ryvus,
-    
-    parse: function(incoming) {
-        var parse = expressoParser.parseExpressoExpression(incoming);
+    if(parse.value0) return new Expression(parse.value0);
 
-        if(parse.value0) return new Expression(parse.value0);
-
-        return undefined;
-    }    
+    return undefined;    
 };
