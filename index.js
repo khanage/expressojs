@@ -1802,12 +1802,10 @@ function Expression(value) {
     this.toString = function() { return Data.expressionShow.show(value); };
 };
 
-module.exports = {
-    version: "0.0.3",
-
+exports = {
+    version: "0.0.5",
 
     raw: ryvus,
-    
     
     parse: function(incoming) {
         var parse = expressoParser.parseExpressoExpression(incoming);

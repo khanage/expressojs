@@ -1,7 +1,7 @@
 {
     "name": "expresso",
     "homepage":"https://github.com/khanage/expressojs",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "license": "MIT",
     "repository": {
         "type":"git",

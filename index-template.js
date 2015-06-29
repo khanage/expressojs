@@ -50,8 +50,8 @@ function Expression(value) {
     this.toString = function() { return Data.expressionShow.show(value); };
 };
 
-module.exports = {
-    version: "0.0.4",
+exports = {
+    version: "0.0.5",
 
     raw: ryvus,
     
