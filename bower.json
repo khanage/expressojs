@@ -1,7 +1,7 @@
 {
     "name": "expresso",
     "homepage":"https://github.com/khanage/expressojs",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "license": "MIT",
     "repository": {
         "type":"git",
@@ -11,11 +11,13 @@
         "**/.*",
         "node_modules",
         "bower_components",
-        "output",
         "test",
         "src",
         "bower.json",
         "package.json",
+        "expresso-raw.js",
+        "index-template.js",
+        "src",
         "gulpfile.js"
     ],
     "dependencies": {

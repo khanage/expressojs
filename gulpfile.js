@@ -1,30 +1,40 @@
-var gulp = require('gulp'),
-    install = require('gulp-install'),
-    exec = require('child_process').exec,
-    browserify = require('browserify'),
-    source = require('vinyl-source-stream');
+var gulp       = require('gulp'),
+    install    = require('gulp-install'),
+    run        = require('gulp-run'),
+    source     = require('vinyl-source-stream'),
+    purescript = require('gulp-purescript'),
+    include    = require('gulp-include'),
+    rename     = require('gulp-rename');
 
 gulp.task('restore-packages', function() { 
-    return gulp.src(['./bower.json'])
+    return gulp.src(['./package.json', './bower.json'])
 	.pipe(install());
 });
 
-gulp.task('pulp', function(cb) {
-    return exec('pulp build', function(err, stdout, stderr) {
-        cb(err);
-    });
+gulp.task('build', function(cb) {
+    run('pulp build').exec();
 });
 
-
-gulp.task('test', function(cb) {
-    return exec('pulp test', function(err, stdout, stderr) {
-        cb(err);
-    });
+gulp.task('test', ['build'], function(cb) {
+    run('pulp test').exec();
 });
 
-gulp.task('copy-porcelein', function(cb) {
-    return gulp.src ('./src/Expresso/index.js')
-        .pipe (gulp.dest ('./output/Expresso/'));
+gulp.task('produce-expresso', function(cb){
+    run('~/bin/psc-bundle ~/Dropbox/js/pulpparse/output/**/*.js '
+        + ' -m Expresso.Operations'
+        + ' -m Expresso.Parser'
+        + ' -m Expresso.Parser.Data'
+        + ' -m Data.String'
+        + ' --namespace Ryvus'
+        + ' > expresso-raw.js')
+        .exec();
 });
 
-gulp.task('default', ['restore-packages', 'pulp', 'test', 'copy-porcelein']);
+gulp.task('wrap-purescript', function(cb) {
+    return gulp.src('index-template.js')
+        .pipe(include())
+        .pipe(rename('index.js'))
+        .pipe(gulp.dest('.'));
+});
+
+gulp.task('default', ['restore-packages', 'wrap-purescript']);
