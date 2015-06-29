@@ -57,3 +57,6 @@ var parse = function(incoming) {
 
     return undefined;    
 };
+
+var exports = (module || {}).exports || {};
+exports.parse = parse;
