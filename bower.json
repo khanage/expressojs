@@ -9,26 +9,31 @@
     },
     "ignore": [
         "**/.*",
-        "node_modules",
-        "bower_components",
-        "test",
-        "src",
-        "bower.json",
+
         "package.json",
-        "expresso-raw.js",
-        "index-template.js",
+        "node_modules",
+        
+        "bower.json",        
+        "bower_components",
+        
+        "gulpfile.js",
+
         "src",
-        "gulpfile.js"
+        "test",
+        "output",
+        
+        "expresso-raw.js",
+        "index-template.js"
     ],
-    "dependencies": {
+    "dependencies": {  },
+    "devDependencies": {
+        "purescript-test-unit": "~1.1.6",
+        "purescript-strongcheck": "~0.9.0",       
         "purescript-parsing": "~0.3.1",
         "purescript-control": "~0.2.6",
         "purescript-lens": "~0.7.0",
         "purescript-strings": "~0.4.5",
         "purescript-lists": "~0.6.2"
-    },
-    "devDependencies": {
-        "purescript-test-unit": "~1.1.6",
-        "purescript-strongcheck": "~0.9.0"
+
     }
 }
