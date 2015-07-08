@@ -17,50 +17,73 @@ main = do
   expressionReplaced
   parentReplaced
   branchReplaced
+  branchFlattened
 
 expressionReplaced =
   test "replace placeholder" do
-    let placeholder = Placeholder
-        unreplacedExpression = expression "Make" $ facetValue "Holden"
+    let placeholder = e"(<!>)"
+        unreplacedExpression = e"Make.Holden."
 
     assertC "expression that wasn't a placeholder was modified" $
-      expressionBecame unreplacedExpression unreplacedExpression $ Nothing
+      unreplacedExpression `replacedWithIs` unreplacedExpression $ Nothing
 
     assertC "naked placeholder was not replaced" $
-      expressionBecame placeholder unreplacedExpression $ Just unreplacedExpression
+      placeholder `replacedWithIs` unreplacedExpression $ Just unreplacedExpression
 
 parentReplaced =
   test "replace placeholder in parent expression" do
-    let parentExpression c = parentOf (aspectAndFacet "Make" $ facetValue "Holden") c
-        placeholderExpression = parentExpression Placeholder
-        replacement = expression "Model" $ facetValue "Commodore"
-        expected = parentExpression replacement
+    let placeholderExpression = e"(C.Make.Holden._.(<!>))"
+        replacement           = e"Model.Commodore."
+        expected              = e"(C.Make.Holden._.Model.Commodore.)"
 
     assertC "placeholder value was not replaced" $
-      expressionBecame placeholderExpression replacement $ Just expected
+      placeholderExpression `replacedWithIs` replacement $ Just expected
 
     assertC "expression was changed when it shouldn't've been" $
-      expressionBecame expected replacement Nothing
+      expected `replacedWithIs` replacement $ Nothing
 
 branchReplaced =
-  test "and expression" do
-    let branchWith e = branchOf And [expression "Make" (facetValue "Holden"), e]
-        replacement = expression "Model" $ facetValue "Commodore"
-        placeholder = branchWith Placeholder
-        expected = branchWith replacement
+  test "and branch expression" do
+    let replacement = e"Model.Commodore."
+        placeholder = e"(And.Make.Holden._.(<!>))"
+        expected    = e"(And.Make.Holden._.Model.Commodore.)"
 
     assertC "placeholder wasn't replaced" $
-      expressionBecame placeholder replacement $ Just expected
+      placeholder `replacedWithIs` replacement $ Just expected
 
     assertC "expression was modified when it shouldn't've been" $
-      expressionBecame expected replacement Nothing
+      expected `replacedWithIs` replacement $ Nothing
 
-expressionBecame :: forall e.
+branchFlattened =
+  test "nested branch expressions" do
+    let placeholderBranch = e"(And.Make.Holden._.(<!>))"
+
+        nestedBranch      = e"(And.Model.Commodore._.Color.Black.)"
+        flattenedBranch   = e"(And.Make.Holden._.Model.Commodore._.Color.Black.)"
+
+        unnestedBranch    = e"(Or.Model.Commodore._.Color.Black.)"
+        unflattenedBranch = e"(And.Make.Holden._.(Or.Model.Commodore._.Color.Black.))"
+
+        additionalVals    = e"(And.Make.Holden._.Color.Black._.(<!>))"
+        duplicatedBranch  = e"(And.Make.Holden._.Model.Commodore.)"
+        dedupedBranch     = e"(And.Make.Holden._.Color.Black._.Model.Commodore.)"
+ 
+    assertC "nested branch wasn't flattened" $
+      placeholderBranch `replacedWithIs` nestedBranch $ Just flattenedBranch
+
+    assertC "mismatched branch was flattened" $
+      placeholderBranch `replacedWithIs` unnestedBranch $ Just unflattenedBranch
+
+    assertC "duplicates in replaced branch were not flattened" $
+      additionalVals `replacedWithIs` duplicatedBranch $ Just dedupedBranch
+    
+
+replacedWithIs :: forall e.
                     ExpressoExpression
                  -> ExpressoExpression
                  -> Maybe ExpressoExpression
                  -> ContT Unit (Eff ( trace :: Trace | e)) Boolean
-expressionBecame incoming replacement Nothing =
+replacedWithIs incoming replacement Nothing =
   lift $ case replacePlaceholder incoming replacement of
     Nothing -> return true
 
@@ -71,7 +94,7 @@ expressionBecame incoming replacement Nothing =
       print $ "Result:   " <> show r
       return false
 
-expressionBecame incoming replacement (Just expected) =
+replacedWithIs incoming replacement (Just expected) =
   lift $ case replacePlaceholder incoming replacement of
     Just r | r == expected -> return true
 
@@ -89,3 +112,7 @@ expressionBecame incoming replacement (Just expected) =
       print $ "Incoming: " <> show incoming
       print $ "Expected: " <> show expected
       return false
+
+e incoming =
+  case parseExpressoExpression incoming of
+    Just exp -> exp

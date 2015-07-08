@@ -651,6 +651,23 @@ var Ryvus = { };
   }
   ; 
   var semigroupArray = new Prelude.Semigroup(append);
+  var nubBy = function ($eq$eq) {
+      return function (_229) {
+          if (_229.length === 0) {
+              return [  ];
+          };
+          if (_229.length >= 1) {
+              var _1035 = _229.slice(1);
+              return Prelude[":"](_229[0])(nubBy($eq$eq)(filter(function (y) {
+                  return !$eq$eq(_229[0])(y);
+              })(_1035)));
+          };
+          throw new Error("Failed pattern match");
+      };
+  };
+  var nub = function (__dict_Eq_1) {
+      return nubBy(Prelude["=="](__dict_Eq_1));
+  };
   exports["replicate"] = replicate;
   exports["takeWhile"] = takeWhile;
   exports["dropWhile"] = dropWhile;
@@ -4164,10 +4181,10 @@ var Ryvus = { };
   "use strict";
   var Prelude = Ryvus["Prelude"];
   var Data_Foldable = Ryvus["Data.Foldable"];
+  var Data_Array = Ryvus["Data.Array"];
   var Data_Maybe = Ryvus["Data.Maybe"];
   var Expresso_Parser_Data = Ryvus["Expresso.Parser.Data"];
-  var Optic_Core = Ryvus["Optic.Core"];
-  var Data_Array = Ryvus["Data.Array"];  
+  var Optic_Core = Ryvus["Optic.Core"];  
   var replacePlaceholder = function (expression) {
       return function (toReplace) {
           if (expression instanceof Expresso_Parser_Data.Placeholder) {
@@ -4183,14 +4200,20 @@ var Ryvus = { };
           if (expression instanceof Expresso_Parser_Data.BranchOf) {
               var evaluateAllBranches = function (currentExp) {
                   return function (seed) {
-                      var _2374 = replacePlaceholder(currentExp)(toReplace);
-                      if (_2374 instanceof Data_Maybe.Just) {
+                      var _6 = replacePlaceholder(currentExp)(toReplace);
+                      if (_6 instanceof Data_Maybe.Just && (_6.value0 instanceof Expresso_Parser_Data.BranchOf && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_6.value0.value0)(expression.value0))) {
                           return {
                               found: true, 
-                              res: Prelude[":"](_2374.value0)(seed.res)
+                              res: Prelude["++"](Data_Array.semigroupArray)(_6.value0.value1)(seed.res)
                           };
                       };
-                      if (_2374 instanceof Data_Maybe.Nothing) {
+                      if (_6 instanceof Data_Maybe.Just) {
+                          return {
+                              found: true, 
+                              res: Prelude[":"](_6.value0)(seed.res)
+                          };
+                      };
+                      if (_6 instanceof Data_Maybe.Nothing) {
                           return {
                               found: seed.found, 
                               res: Prelude[":"](currentExp)(seed.res)
@@ -4199,12 +4222,12 @@ var Ryvus = { };
                       throw new Error("Failed pattern match");
                   };
               };
-              var _2376 = Data_Foldable.foldr(Data_Foldable.foldableArray)(evaluateAllBranches)({
+              var _11 = Data_Foldable.foldr(Data_Foldable.foldableArray)(evaluateAllBranches)({
                   found: false, 
                   res: [  ]
               })(expression.value1);
-              if (_2376.found) {
-                  return Data_Maybe.Just.create(new Expresso_Parser_Data.BranchOf(expression.value0, _2376.res));
+              if (_11.found) {
+                  return Data_Maybe.Just.create(new Expresso_Parser_Data.BranchOf(expression.value0, Data_Array.nub(Expresso_Parser_Data.expressionEq)(_11.res)));
               };
               return Data_Maybe.Nothing.value;
           };
@@ -4212,18 +4235,18 @@ var Ryvus = { };
       };
   };
   var expressionBuilder = function (op) {
-      return function (_701) {
-          return function (_702) {
-              if (_701 instanceof Expresso_Parser_Data.BranchOf && (_702 instanceof Expresso_Parser_Data.BranchOf && (Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_701.value0)(op) && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_702.value0)(op)))) {
-                  return new Expresso_Parser_Data.BranchOf(op, Prelude["++"](Data_Array.semigroupArray)(_701.value1)(_702.value1));
+      return function (_0) {
+          return function (_1) {
+              if (_0 instanceof Expresso_Parser_Data.BranchOf && (_1 instanceof Expresso_Parser_Data.BranchOf && (Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_0.value0)(op) && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_1.value0)(op)))) {
+                  return new Expresso_Parser_Data.BranchOf(op, Prelude["++"](Data_Array.semigroupArray)(_0.value1)(_1.value1));
               };
-              if (_701 instanceof Expresso_Parser_Data.BranchOf && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_701.value0)(op)) {
-                  return new Expresso_Parser_Data.BranchOf(op, Prelude["++"](Data_Array.semigroupArray)(_701.value1)([ _702 ]));
+              if (_0 instanceof Expresso_Parser_Data.BranchOf && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_0.value0)(op)) {
+                  return new Expresso_Parser_Data.BranchOf(op, Prelude["++"](Data_Array.semigroupArray)(_0.value1)([ _1 ]));
               };
-              if (_702 instanceof Expresso_Parser_Data.BranchOf && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_702.value0)(op)) {
-                  return new Expresso_Parser_Data.BranchOf(op, Prelude[":"](_701)(_702.value1));
+              if (_1 instanceof Expresso_Parser_Data.BranchOf && Prelude["=="](Expresso_Parser_Data.branchTypeEq)(_1.value0)(op)) {
+                  return new Expresso_Parser_Data.BranchOf(op, Prelude[":"](_0)(_1.value1));
               };
-              return new Expresso_Parser_Data.BranchOf(op, [ _701, _702 ]);
+              return new Expresso_Parser_Data.BranchOf(op, [ _0, _1 ]);
           };
       };
   };
@@ -4892,17 +4915,19 @@ var Ryvus = { };
   "use strict";
   var Prelude = Ryvus["Prelude"];
   var Test_Unit = Ryvus["Test.Unit"];
-  var Expresso_Parser_Data = Ryvus["Expresso.Parser.Data"];
   var Control_Monad_Trans = Ryvus["Control.Monad.Trans"];
   var Expresso_Operations = Ryvus["Expresso.Operations"];
   var Debug_Trace = Ryvus["Debug.Trace"];
+  var Expresso_Parser = Ryvus["Expresso.Parser"];
   var Control_Monad_Cont_Trans = Ryvus["Control.Monad.Cont.Trans"];
   var Control_Monad_Eff = Ryvus["Control.Monad.Eff"];
   var Data_Maybe = Ryvus["Data.Maybe"];
   var Text_Parsing_Parser = Ryvus["Text.Parsing.Parser"];
-  var Expresso_Parser = Ryvus["Expresso.Parser"];
+  var Expresso_Parser_Data = Ryvus["Expresso.Parser.Data"];
   var Control_Monad_Error_Trans = Ryvus["Control.Monad.Error.Trans"];
-  exports["expressionBecame"] = expressionBecame;
+  exports["e"] = e;
+  exports["replacedWithIs"] = replacedWithIs;
+  exports["branchFlattened"] = branchFlattened;
   exports["branchReplaced"] = branchReplaced;
   exports["parentReplaced"] = parentReplaced;
   exports["expressionReplaced"] = expressionReplaced;

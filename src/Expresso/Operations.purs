@@ -4,7 +4,8 @@ import Data.Maybe
 import Data.Foldable
 import Expresso.Parser.Data
 import Optic.Core
-    
+import Data.Array (nub)
+
 expressionBuilder :: BranchType -> ExpressoExpression -> ExpressoExpression -> ExpressoExpression
 expressionBuilder op (BranchOf opl left) (BranchOf opr right)
   | opl == op && opr == op
@@ -37,12 +38,15 @@ replacePlaceholder expression toReplace =
     BranchOf operator expressions ->
       let evaluateAllBranches currentExp seed = 
             case replacePlaceholder currentExp toReplace of
+              Just (BranchOf childOperator children)
+                | childOperator == operator
+                            -> { found: true      , res: (children ++seed.res) }
               Just replaced -> { found: true      , res: (  replaced:seed.res) }
               Nothing       -> { found: seed.found, res: (currentExp:seed.res) }
 
       in case foldr evaluateAllBranches {found: false, res: []} expressions of
         {found = foundInEval, res = modifiedResults}
-          | foundInEval -> Just $ BranchOf operator modifiedResults
+          | foundInEval -> Just $ BranchOf operator (nub modifiedResults)
         otherwise -> Nothing
 
     otherwise -> Nothing
