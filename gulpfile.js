@@ -9,7 +9,9 @@ rename      = require('gulp-rename'),
 bump        = require('gulp-bump'),
 git         = require('gulp-git'),
 tag_version = require('gulp-tag-version'),
-filter      = require('gulp-filter')
+filter      = require('gulp-filter'),
+browserify  = require('gulp-browserify'),
+closure     = require('gulp-closure-compiler')
 ;
 
 gulp.task('restore-packages', function() { 
@@ -25,23 +27,29 @@ gulp.task('test', ['build'], function(cb) {
     run('pulp test').exec(cb);
 });
 
-gulp.task('produce-expresso', ['test', 'build'], function(cb){
-    run('~/bin/psc-bundle ~/Dropbox/js/pulpparse/output/**/*.js '
-        + ' -m Expresso.Operations'
-        + ' -m Expresso.Parser'
-        + ' -m Expresso.Parser.Data'
-        + ' -m Data.String'
-        + ' --namespace Ryvus'
-        + ' > expresso-raw.js')
-        .exec(cb);
+gulp.task('package', [], function() {
+    gulp.src('src/Expresso/index.js')
+        .pipe(browserify({
+            standalone: 'expresso'
+        }))
+        // .pipe(closure({
+        //     compilerPath: 'bower_components/closure-compiler/lib/vendor/compiler.jar',
+        //     fileName: 'index.js',
+        //     compilerFlags: {
+        //         compilation_level: 'ADVANCED_OPTIMIZATIONS',
+        //         common_js_entry_module: 'expresso'
+        //     }
+        // }))
+        .pipe(gulp.dest('./'));
 });
 
-gulp.task('wrap-purescript', ['produce-expresso'], function(cb) {
-    return gulp.src('index-template.js')
-        .pipe(include())
-        .pipe(rename('index.js'))
-        .pipe(gulp.dest('.'));
-});
+// gulp.task('test-package', [], function(cb) {
+//     run('node -e "'
+//         + 'var exp = require(\'./index.js\'); '
+//         + 'var parse = exp.parse(\'Make.Holden.\'); '
+//         + 'console.log(typeof(parse) != \"undefined\"); "'
+//        ).exec(cb);
+// });
 
 gulp.task('bump', function() {
     gulp.src(['./bower.json', './package.json'])
@@ -52,4 +60,4 @@ gulp.task('bump', function() {
         .pipe(tag_version());
 });
 
-gulp.task('default', ['wrap-purescript']);
+gulp.task('default', ['package']);

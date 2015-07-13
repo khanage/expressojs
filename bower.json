@@ -1,33 +1,34 @@
 {
-    "name": "expresso",
-    "homepage": "https://github.com/khanage/expressojs",
-    "version": "0.1.2",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/khanage/expressojs.git"
-    },
-    "ignore": [
-        "**/.*",
-        "package.json",
-        "node_modules",
-        "bower.json",
-        "bower_components",
-        "gulpfile.js",
-        "src",
-        "test",
-        "output",
-        "expresso-raw.js",
-        "index-template.js"
-    ],
-    "dependencies": {},
-    "devDependencies": {
-        "purescript-test-unit": "~1.1.6",
-        "purescript-strongcheck": "~0.9.0",
-        "purescript-parsing": "~0.3.1",
-        "purescript-control": "~0.2.6",
-        "purescript-lens": "~0.7.0",
-        "purescript-strings": "~0.4.5",
-        "purescript-lists": "~0.6.2"
-    }
+  "name": "expresso",
+  "homepage": "https://github.com/khanage/expressojs",
+  "version": "0.1.2",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/khanage/expressojs.git"
+  },
+  "ignore": [
+    "**/.*",
+    "package.json",
+    "node_modules",
+    "bower.json",
+    "bower_components",
+    "gulpfile.js",
+    "src",
+    "test",
+    "output",
+    "expresso-raw.js",
+    "index-template.js"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "purescript-test-unit": "~1.1.6",
+    "purescript-strongcheck": "~0.9.0",
+    "purescript-parsing": "~0.3.1",
+    "purescript-control": "~0.2.6",
+    "purescript-lens": "~0.7.0",
+    "purescript-strings": "~0.4.5",
+    "purescript-lists": "~0.6.2",
+    "closure-compiler": "~0.2.6"
+  }
 }

@@ -75,8 +75,7 @@ branchFlattened =
       placeholderBranch `replacedWithIs` unnestedBranch $ Just unflattenedBranch
 
     assertC "duplicates in replaced branch were not flattened" $
-      additionalVals `replacedWithIs` duplicatedBranch $ Just dedupedBranch
-    
+      additionalVals `replacedWithIs` duplicatedBranch $ Just dedupedBranch    
 
 replacedWithIs :: forall e.
                     ExpressoExpression

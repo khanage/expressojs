@@ -1,7 +1,6 @@
-var expressoParser = require('Expresso.Parser');
-var Prelude = require('Prelude');
-var Data = require('Expresso.Parser.Data');
-var Operators = require('Expresso.Operations');
+var expressoParser = require("Expresso.Parser");
+var Data = require("Expresso.Parser.Data");
+var Operators = require("Expresso.Operations");
 
 expressionOperator = function(operator) {
     return function(left, expressionForRight) {
@@ -27,9 +26,9 @@ function Expression(value) {
         
         return new Expression(oredResult);
     };
-      
+    
     this.replacePlaceholderWith = function(expression) {
-        var replacedValue = Operators.replacePlaceholder(expression.rawExpression)(value);
+        var replacedValue = Operators.replacePlaceholder(value)(expression.rawExpression);
 
         if(replacedValue.value0) return new Expression(replacedValue.value0);
 
@@ -39,14 +38,12 @@ function Expression(value) {
     this.toString = function() { return Data.expressionShow.show(value); };
 };
 
-module.exports = {
-    version: "0.1",
-    
-    parse: function(incoming) {
-        var parse = expressoParser.parseExpressoExpression(incoming);
+var parse = function(incoming) {
+    var parse = expressoParser.parseExpressoExpression(incoming);
 
-        if(parse.value0) return new Expression(parse.value0);
+    if(parse.value0) return new Expression(parse.value0);
 
-        return undefined;
-    }    
+    return undefined;    
 };
+
+exports.parse = parse;
