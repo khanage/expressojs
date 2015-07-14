@@ -3,9 +3,6 @@ gulp        = require('gulp'),
 install     = require('gulp-install'),
 run         = require('gulp-run'),
 source      = require('vinyl-source-stream'),
-purescript  = require('gulp-purescript'),
-include     = require('gulp-include'),
-rename      = require('gulp-rename'),
 bump        = require('gulp-bump'),
 git         = require('gulp-git'),
 tag_version = require('gulp-tag-version'),
@@ -20,14 +17,14 @@ gulp.task('restore-packages', function() {
 });
 
 gulp.task('build', function(cb) {
-    run('pulp build').exec(cb);
+    run("pulp build -o node_modules").exec(cb);
 });
 
 gulp.task('test', ['build'], function(cb) {
     run('pulp test').exec(cb);
 });
 
-gulp.task('package', [], function() {
+gulp.task('package', ['test'], function() {
     gulp.src('src/Expresso/index.js')
         .pipe(browserify({
             standalone: 'expresso'
