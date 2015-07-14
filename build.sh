@@ -1,18 +1,15 @@
 #!/bin/bash
 
-echo "Building image"
+echo "Running gulp build"
 
+echo "Building docker image"
 hash boot2docker &> /dev/null
 if [ $? -eq 1 ]; then
-    echo "Found boot2docker, running shellinit"
     $(boot2docker shellinit)
 fi
-
 docker build -t ryvus/expressojs --rm .
 
-echo "Built"
+echo "Running gulp build => index.js"
+docker run --rm ryvus/expressojs 1> index.js
 
-echo "Run gulp once attached"
-echo "exit to quit."
-
-docker run -it --rm ryvus/expressojs
+echo "Done"

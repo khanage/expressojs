@@ -20,6 +20,9 @@ RUN apt-get update && \
 
 WORKDIR /app
 
+ADD buildscript.sh /app/buildscript.sh
+RUN chmod +x /app/buildscript.sh
+
 ADD package.json /app/package.json
 RUN npm install
 
@@ -32,3 +35,5 @@ ADD ./.git /app/.git
 
 ADD ./test /app/test
 ADD ./src /app/src
+
+ENTRYPOINT ["/app/buildscript.sh"]
